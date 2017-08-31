@@ -56,4 +56,33 @@ import numpy as np
 #
 # if name in people:
 #     print "%s's %s is %s." % (name, labels[key], people[name][key])
+# from copy import deepcopy
+# x = {'username': 'admin', 'machins': ['foo', 'bar', 'baz']}
+# y = x.copy()
+# dc = deepcopy(x)
+# y['username'] = 'mln'
+# y['machins'].remove('bar')
+# print x, dc
+strings = [('a', 2), ('b', 3), ('c', 3), ('d', 2), ('e', 1)]
+# strings = {'a': 2, 'b': 3, 'c': 3, 'd': 2, 'e': 1}
 
+for index, string in enumerate(strings):
+    if 'a' in string:
+        strings[index] = 'aa'
+
+print strings
+
+print ''.join(reversed("hello,world!"))
+# print train[:, :3]
+
+# scope={}
+# from math import sqrt
+# exec 'sqrt = 1' in scope
+# print scope['sqrt']
+
+fibs = [0, 1]
+num = raw_input('How many Fibonacci numbers do you want?: ')
+for i in range(num - 2):
+    fibs.append(fibs[-2] + fibs[-1])
+
+print fibs

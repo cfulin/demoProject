@@ -55,5 +55,3 @@ result = opener.open(gradeUrl)
 print result.read()
 
 
-
-

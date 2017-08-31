@@ -86,3 +86,4 @@ if __name__ == '__main__':
     pool = multiprocessing.Pool()
     # pool.map(main, [i * 10 for i in range(10)])
     pool.map(main, [i * 25 for i in range(11)])
+    pool.close()
