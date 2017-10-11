@@ -189,3 +189,11 @@ print(list(flatten([['caca'], ['casca', 'c'], ['caa', 'qqq', ['dddd', 'sad']], [
 #         yield {
 #             "city": item[0]
 #         }
+
+# url = 'http://maoyan.com/board/4?offset=' + str(offset)
+# url = 'http://www.360doc.com/content/12/0601/21/6818730_215294560.shtml'
+# url = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2013/13.html'
+# url = 'http://data.acmr.com.cn/member/city/city_md.asp'
+# html = get_one_page(url)
+# for item in parse_one_page(html):
+#     write_to_file(item)

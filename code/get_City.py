@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 import json
 import pandas as pd
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 
-def read_excel():
+def read_cityfile():
     # 打开文件
     inpath = 'city1.json'
     outpath = inpath.split('.')[0] + '_outfile' + '.xlsx'
@@ -35,22 +38,32 @@ def flatten(nested):
 
 
 def dataProcess(data):
-    data = data.dropna(axis=0, how='all', thresh=None)  # 一行全为空舍弃(axis=1)为行删除
+    data = list(data.values)
+    flag = 0
+    for cityName in data:
+        citys = str(cityName[0]).replace(u'市', "").replace(u'自治州', "").replace(u'哈萨克', "").replace(u'盟', "")\
+            .replace(u'土家族', "").replace(u'苗族', "").replace(u'藏族', "").replace(u'蒙古族', "")\
+            .replace(u'羌族', "").replace(u'彝族', "").replace(u'傣族', "").replace(u'回族', "") \
+            .replace(u'朝鲜族', "").replace(u'布依族', "") .replace(u'侗族', "").replace(u'哈尼族', "") \
+            .replace(u'白族', "").replace(u'景颇族', "") .replace(u'傈僳族', "").replace(u'蒙古', "") \
+            .replace(u'壮族', "").replace(u'地区', "")
+        data[flag][0] = citys
+        flag += 1
+    data = pd.DataFrame(data, columns=['city'])
+
+    data = data.dropna(axis=0, how='all', thresh=None, subset=None, inplace=False)
     data = data.drop_duplicates()  # 去除重复行
-    data.to_excel('citydealfile.xlsx')
-    return data
+    none_vin = (data['city'].isnull()) | (data['city'].apply(lambda x: str(x).isspace()))
+    data_not_null = data[~none_vin]  # 去除空格
+
+    data_not_null.to_excel("city1_dealcity.xlsx")
+    print data_not_null
+    print("City data has been got successful!")
 
 
 def main():
-    inpath, outpath = read_excel()
-    # url = 'http://maoyan.com/board/4?offset=' + str(offset)
-    # url = 'http://www.360doc.com/content/12/0601/21/6818730_215294560.shtml'
-    # url = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2013/13.html'
-    # url = 'http://data.acmr.com.cn/member/city/city_md.asp'
-    # html = get_one_page(url)
-    # for item in parse_one_page(html):
-    #     write_to_file(item)
-    cityData = getCity(inpath)  # 获取city名称
+    inpath, outpath = read_cityfile()
+    cityData = getCity(inpath)  # 获取数据
     flatCity = flatten(cityData)  # 递归生成器连接
     cityData = pd.DataFrame(flatCity, columns=['city'])  # DataFrame转换字符串
     cityData.to_excel(outpath)  # 输出city到excel
