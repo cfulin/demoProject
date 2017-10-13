@@ -4,70 +4,78 @@ import json
 import pandas as pd
 import sys
 reload(sys)
-sys.setdefaultencoding("utf-8")
+sys.setdefaultencoding("gbk")
 
 
 def read_cityfile():
     # 打开文件
-    inpath = 'city1.json'
+    inpath = 'city.txt'
     outpath = inpath.split('.')[0] + '_outfile' + '.xlsx'
     # outpath = unicode('outfile.xlsx', 'utf-8')
     return inpath, outpath
 
 
-def getCity(inpath):
-    with open(inpath, 'r') as f:
-        data = json.load(f)
-    gLen = len(data['data'])
-    city = []
-    for i in range(gLen):
-        city.append(data['data'][i]['c'])
-    return city
+def get_City(inpath):
+    cityData = []
+    data = open(inpath, 'r')
+    while True:
+        line = data.readline()
+        if line:
+            cityData.append(line)
+        else:
+            break
+    data.close()
+    return cityData
 
 
-def flatten(nested):
-    try:
-        try: nested + ''
-        except TypeError: pass
-        else: raise TypeError
-        for sublist in nested:
-            for element in flatten(sublist):
-                yield element
-    except TypeError:
-        yield nested
+# def flatten(nested):
+#     try:
+#         try: nested + ''
+#         except TypeError: pass
+#         else: raise TypeError
+#         for sublist in nested:
+#             for element in flatten(sublist):
+#                 yield element
+#     except TypeError:
+#         yield nested
 
 
-def dataProcess(data):
-    data = list(data.values)
+def data_Process(data):
     flag = 0
     for cityName in data:
-        citys = str(cityName[0]).replace(u'市', "").replace(u'自治州', "").replace(u'哈萨克', "").replace(u'盟', "")\
-            .replace(u'土家族', "").replace(u'苗族', "").replace(u'藏族', "").replace(u'蒙古族', "")\
-            .replace(u'羌族', "").replace(u'彝族', "").replace(u'傣族', "").replace(u'回族', "") \
-            .replace(u'朝鲜族', "").replace(u'布依族', "") .replace(u'侗族', "").replace(u'哈尼族', "") \
-            .replace(u'白族', "").replace(u'景颇族', "") .replace(u'傈僳族', "").replace(u'蒙古', "") \
-            .replace(u'壮族', "").replace(u'地区', "")
-        data[flag][0] = citys
+        citys = str(cityName).replace(u'黑龙江', "").replace(u'吉林省', "").replace(u'辽宁', "")\
+            .replace(u'新疆', "").replace(u'内蒙', "") .replace(u'西藏', "").replace(u'青海', "") \
+            .replace(u'甘肃', "").replace(u'宁夏', "").replace(u'陕西', "").replace(u'山西', "")\
+            .replace(u'河北', "").replace(u'河南', "").replace(u'山东', "").replace(u'安徽', "")\
+            .replace(u'江苏', "").replace(u'湖北', "").replace(u'湖南', "").replace(u'四川', "")\
+            .replace(u'云南', "").replace(u'贵州', "").replace(u'江西', "").replace(u'浙江', "")\
+            .replace(u'福建', "").replace(u'广西', "").replace(u'广东', "").replace(u'台湾', "") \
+            .replace(u'海南', "").replace(u'重庆', "").replace(u'省', "").replace(u'市', "")\
+            .replace(u'\n', "").replace(' ', "")
+
+        data[flag] = citys
         flag += 1
+    data = list(set(data))
     data = pd.DataFrame(data, columns=['city'])
 
-    data = data.dropna(axis=0, how='all', thresh=None, subset=None, inplace=False)
-    data = data.drop_duplicates()  # 去除重复行
-    none_vin = (data['city'].isnull()) | (data['city'].apply(lambda x: str(x).isspace()))
-    data_not_null = data[~none_vin]  # 去除空格
+    # none_vin = (data['city'].isnull()) | (data['city'].apply(lambda x: str(x).isspace()))
+    # data_not_null = data[~none_vin]  # 去除空格
+    # data_not_null = pd.DataFrame(data_not_null[3:], index=[range(len(data_not_null))])
 
-    data_not_null.to_excel("city1_dealcity.xlsx")
-    print data_not_null
+    data = data.dropna(axis=0, how='any', thresh=None, subset=None, inplace=False)
+    data = data.drop_duplicates(["city"])  # 去除重复行
+    data = data[1:].reset_index(drop=True)
+    data.to_excel("city_dealcity.xlsx")
     print("City data has been got successful!")
 
 
 def main():
     inpath, outpath = read_cityfile()
-    cityData = getCity(inpath)  # 获取数据
-    flatCity = flatten(cityData)  # 递归生成器连接
-    cityData = pd.DataFrame(flatCity, columns=['city'])  # DataFrame转换字符串
-    cityData.to_excel(outpath)  # 输出city到excel
-    dataProcess(cityData)
+    cityData = get_City(inpath)
+    data_Process(cityData[6:])
+    # flatCity = flatten(cityData)
+    cityData = pd.DataFrame(cityData[6:], columns=['city'])
+    cityData.to_excel(outpath)
 
 
 if __name__ == '__main__':

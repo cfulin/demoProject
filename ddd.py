@@ -1,5 +1,5 @@
-# #!/usr/bin/python
-# # -*- coding: utf-8 -*-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # # def method_friendly_decorator(method_to_decorate):
 # #     def wrapper(self, lie):
 # #         lie = lie - 3  # 女性福音 :-)
@@ -157,43 +157,66 @@ list2 = [5, 6, 10, 17, 11, 2]
 # t2 = to_timestamp('2015-5-31 16:10:30', 'UTC-09:00')
 # print(t2)
 
-def flatten(nested):
-    try:
-        try: nested + ''
-        except TypeError: pass
-        else: raise TypeError
-        for sublist in nested:
-            for element in flatten(sublist):
-                yield element
-    except TypeError:
-        yield nested
-
-print(list(flatten([['caca'], ['casca', 'c'], ['caa', 'qqq', ['dddd', 'sad']], ['fgaj', 'hfu']])))
-
-
-
-# def write_to_file(content):
-#     with codecs.open('city.txt', 'a', 'utf-8') as f:
-#         f.write(json.dumps(content, ensure_ascii=False) + '\n')
-#         f.close()
+# def flatten(nested):
+#     try:
+#         try: nested + ''
+#         except TypeError: pass
+#         else: raise TypeError
+#         for sublist in nested:
+#             for element in flatten(sublist):
+#                 yield element
+#     except TypeError:
+#         yield nested
 #
-# # <span style="FONT-SIZE: 15pt; FONT-FAMILY: 宋体; mso-ascii-font-family: 'Times New Roman'; mso-hansi-font-family: 'Times New Roman'">
-# # 个）：太原市、大同市、朔州市、忻州市、阳泉市、晋中市、吕梁市、长治市、临汾市、晋城市、运城市</span>
-# def parse_one_page(html):
-#     # pattern = re.compile('<p.*?class="MsoNormal".*?'
-#     #                      + '<span.*?style="FONT-SIZE:.*?15pt.*?>(.*?)</span>', re.S)
-#     # pattern = re.compile('<table.*?class="citytr".*?<td><a.*?>(.*?)</a></td>', re.S)
-#     pattern = re.compile(u'<td>(.*?)市', re.S)
-#     items = re.findall(pattern, html)
-#     for item in items:
-#         yield {
-#             "city": item[0]
-#         }
+# print(list(flatten([['caca'], ['casca', 'c'], ['caa', 'qqq', ['dddd', 'sad']], ['fgaj', 'hfu']])))
 
-# url = 'http://maoyan.com/board/4?offset=' + str(offset)
-# url = 'http://www.360doc.com/content/12/0601/21/6818730_215294560.shtml'
-# url = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2013/13.html'
-# url = 'http://data.acmr.com.cn/member/city/city_md.asp'
-# html = get_one_page(url)
-# for item in parse_one_page(html):
-#     write_to_file(item)
+
+import codecs
+import json
+import re
+import requests
+from requests.exceptions import RequestException
+
+
+def get_one_page(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            response = response.text
+            return response
+        else:
+            return None
+    except RequestException:
+        return None
+
+
+def write_to_file(content):
+    with codecs.open('city.txt', 'a', 'utf-8') as f:
+        f.write(json.dumps(content, ensure_ascii=False) + '\n')
+        f.close()
+
+# <span style="FONT-SIZE: 15pt; FONT-FAMILY: 宋体; mso-ascii-font-family: 'Times New Roman'; mso-hansi-font-family: 'Times New Roman'">
+# 个）：太原市、大同市、朔州市、忻州市、阳泉市、晋中市、吕梁市、长治市、临汾市、晋城市、运城市</span>
+def parse_one_page(html):
+    # pattern = re.compile('<p.*?class="MsoNormal".*?'
+    #                      + '<span.*?style="FONT-SIZE:.*?15pt.*?>(.*?)</span>', re.S)
+    # pattern = re.compile('<table.*?class="citytr".*?<td><a.*?>(.*?)</a></td>', re.S)
+    pattern = re.compile(u'<td>(.*?)市', re.S)
+    items = re.findall(pattern, html)
+    for item in items:
+        yield {
+            "city": item[0]
+        }
+
+
+def main():
+    # url = 'http://maoyan.com/board/4?offset=' + str(offset)
+    # url = 'http://www.360doc.com/content/12/0601/21/6818730_215294560.shtml'
+    # url = 'http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2013/13.html'
+    url = 'http://data.acmr.com.cn/member/city/city_md.asp'
+    html = get_one_page(url)
+    for item in parse_one_page(html):
+        write_to_file(item)
+
+if __name__ == '__main__':
+    main()
